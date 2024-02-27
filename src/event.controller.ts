@@ -11,44 +11,42 @@ import {
 import { CreateEventDto } from './create-event.dto';
 import { UpdateEventDto } from './update-event.dto';
 import { Event } from './event.entity';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Controller('/events')
 export class EventsController {
-  private events: Event[] = [];
+  constructor(
+    @InjectRepository(Event) private readonly repository: Repository<Event>,
+  ) {}
   @Get()
-  findAll() {
-    return this.events;
+  async findAll() {
+    return await this.repository.find();
   }
   @Get('/:id')
-  findOne(@Param('id') id) {
-    return this.events.find((event) => event.id === +id);
+  async findOne(@Param('id') id) {
+    return await this.repository.findOne(id);
   }
   @Post()
-  create(@Body() body: CreateEventDto) {
-    const event = {
+  async create(@Body() body: CreateEventDto) {
+    return await this.repository.save({
       ...body,
       when: new Date(body.when),
-      id: this.events.length + 1,
-    };
-    this.events.push(event);
-    return event;
+    });
   }
   @Patch('/:id')
-  update(@Param('id') id, @Body() body: UpdateEventDto) {
-    const index = this.events.findIndex((event) => event.id === +id);
-    this.events[index] = {
-      ...this.events[index],
+  async update(@Param('id') id, @Body() body: UpdateEventDto) {
+    const event = await this.repository.findOne(id);
+    return await this.repository.update(id, {
+      ...event,
       ...body,
-      when: body.when ? new Date(body.when) : this.events[index].when,
-    };
-    return this.events[index];
+      when: body.when ? new Date(body.when) : event.when,
+    });
   }
   @Delete('/:id')
   @HttpCode(204)
-  remove(@Param('id') id) {
-    this.events = this.events.filter((event) => {
-      return event.id !== +id;
-    });
-    return id;
+  async remove(@Param('id') id) {
+    const event = await this.repository.findOne(id);
+    return await this.repository.remove(event);
   }
 }
