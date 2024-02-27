@@ -7,11 +7,12 @@ import {
   Param,
   Patch,
   Post,
+  ValidationPipe,
 } from '@nestjs/common';
 import { CreateEventDto } from './create-event.dto';
 import { UpdateEventDto } from './update-event.dto';
 import { Event } from './event.entity';
-import { Repository } from 'typeorm';
+import { Like, MoreThan, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
 @Controller('/events')
@@ -23,20 +24,46 @@ export class EventsController {
   async findAll() {
     return await this.repository.find();
   }
-  @Get('/:id')
-  async findOne(@Param('id') id) {
-    return await this.repository.findOne(id);
+  @Get('practis')
+  async practis() {
+    return await this.repository.find({
+      select: ['id', 'when'],
+      where: [
+        {
+          id: MoreThan(2),
+          when: MoreThan(new Date('2021-02-12t13:00:00')),
+        },
+        {
+          description: Like('%meet%'),
+        },
+      ],
+      take: 2,
+      skip: 1,
+      order: {
+        id: 'DESC',
+      },
+    });
   }
+  @Get(':id')
+  async findOne(@Param('id') id) {
+    return await this.repository.findOne({ where: { id } });
+  }
+
   @Post()
-  async create(@Body() body: CreateEventDto) {
+  async create(
+    @Body(new ValidationPipe({ groups: ['create'] })) body: CreateEventDto,
+  ) {
     return await this.repository.save({
       ...body,
       when: new Date(body.when),
     });
   }
   @Patch('/:id')
-  async update(@Param('id') id, @Body() body: UpdateEventDto) {
-    const event = await this.repository.findOne(id);
+  async update(
+    @Param('id') id,
+    @Body(new ValidationPipe({ groups: ['create'] })) body: UpdateEventDto,
+  ) {
+    const event = await this.repository.findOne({ where: { id } });
     return await this.repository.update(id, {
       ...event,
       ...body,
@@ -46,7 +73,7 @@ export class EventsController {
   @Delete('/:id')
   @HttpCode(204)
   async remove(@Param('id') id) {
-    const event = await this.repository.findOne(id);
+    const event = await this.repository.findOne({ where: { id } });
     return await this.repository.remove(event);
   }
 }
