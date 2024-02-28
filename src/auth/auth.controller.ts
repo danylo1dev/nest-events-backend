@@ -1,6 +1,7 @@
-import { Controller, Post, Request, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
+import { CurrentUser } from './strategies/curent-user.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -8,10 +9,15 @@ export class AuthController {
 
   @Post('/login')
   @UseGuards(AuthGuard('local'))
-  async login(@Request() req) {
+  async login(@CurrentUser() user) {
     return {
-      userId: req.user.id,
-      token: this.authService.getTokenForUser(req.user),
+      userId: user.id,
+      token: this.authService.getTokenForUser(user),
     };
+  }
+  @Get('/profile')
+  @UseGuards(AuthGuard('jwt'))
+  async getProfile(@CurrentUser() user) {
+    return user;
   }
 }
