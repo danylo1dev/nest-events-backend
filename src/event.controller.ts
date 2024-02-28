@@ -7,13 +7,12 @@ import {
   Param,
   Patch,
   Post,
-  ValidationPipe,
 } from '@nestjs/common';
-import { CreateEventDto } from './create-event.dto';
-import { UpdateEventDto } from './update-event.dto';
-import { Event } from './event.entity';
-import { Like, MoreThan, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Like, MoreThan, Repository } from 'typeorm';
+import { CreateEventDto } from './create-event.dto';
+import { Event } from './event.entity';
+import { UpdateEventDto } from './update-event.dto';
 
 @Controller('/events')
 export class EventsController {
@@ -50,19 +49,14 @@ export class EventsController {
   }
 
   @Post()
-  async create(
-    @Body(new ValidationPipe({ groups: ['create'] })) body: CreateEventDto,
-  ) {
+  async create(@Body() body: CreateEventDto) {
     return await this.repository.save({
       ...body,
       when: new Date(body.when),
     });
   }
   @Patch('/:id')
-  async update(
-    @Param('id') id,
-    @Body(new ValidationPipe({ groups: ['create'] })) body: UpdateEventDto,
-  ) {
+  async update(@Param('id') id, @Body() body: UpdateEventDto) {
     const event = await this.repository.findOne({ where: { id } });
     return await this.repository.update(id, {
       ...event,
