@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   HttpCode,
+  NotFoundException,
   Param,
   Patch,
   Post,
@@ -13,11 +14,13 @@ import { Like, MoreThan, Repository } from 'typeorm';
 import { CreateEventDto } from './create-event.dto';
 import { Event } from './event.entity';
 import { UpdateEventDto } from './update-event.dto';
+import { EventsService } from './events.service';
 
 @Controller('/events')
 export class EventsController {
   constructor(
     @InjectRepository(Event) private readonly repository: Repository<Event>,
+    private readonly eventsService: EventsService,
   ) {}
   @Get()
   async findAll() {
@@ -45,7 +48,11 @@ export class EventsController {
   }
   @Get(':id')
   async findOne(@Param('id') id) {
-    return await this.repository.findOne({ where: { id } });
+    const event = await this.eventsService.getEvent(+id);
+    if (!event) {
+      throw new NotFoundException();
+    }
+    return event;
   }
 
   @Post()
