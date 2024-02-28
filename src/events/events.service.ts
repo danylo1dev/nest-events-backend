@@ -88,4 +88,11 @@ export class EventsService {
       return query;
     }
   }
+  public async deleteEvent(id: number) {
+    return await this.repository
+      .createQueryBuilder('e')
+      .delete()
+      .where('id = :id', { id })
+      .execute();
+  }
 }
