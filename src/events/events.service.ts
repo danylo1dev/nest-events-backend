@@ -4,6 +4,7 @@ import { Event } from './entitis/event.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AttendeeAnswerEnum } from './entitis/attendee.entity';
 import { ListEvents, WhenEventFilter } from './dto/list/list.events';
+import { PaginateOptions, paginate } from 'src/pagination/paginator';
 
 @Injectable()
 export class EventsService {
@@ -50,11 +51,20 @@ export class EventsService {
       .andWhere('e.id = :id', { id })
       .getOne();
   }
-  public async getEventsWithAttendeeContFiltered(filter?: ListEvents) {
+  public async getEventsWithAttendeeContFilteredPaginated(
+    filter: ListEvents,
+    options: PaginateOptions,
+  ) {
+    return await paginate(
+      this.getEventsWithAttendeeContFiltered(filter),
+      options,
+    );
+  }
+  private getEventsWithAttendeeContFiltered(filter?: ListEvents) {
     let query = this.getEventsWithAttendeeCountQuery();
 
     if (Object.keys(filter).length <= 0) {
-      return await query.getMany();
+      return query;
     }
     if (filter.when) {
       if (filter.when == WhenEventFilter.Today) {
@@ -75,7 +85,7 @@ export class EventsService {
           `YEARWEEK(e.when, 1) = YEARWEEK(CURDATE(), 1)+1 `,
         );
       }
-      return await query.getMany();
+      return query;
     }
   }
 }

@@ -9,6 +9,8 @@ import {
   Patch,
   Post,
   Query,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Like, MoreThan, Repository } from 'typeorm';
@@ -25,8 +27,16 @@ export class EventsController {
     private readonly eventsService: EventsService,
   ) {}
   @Get()
+  @UsePipes(new ValidationPipe({ transform: true }))
   async findAll(@Query() filter: ListEvents) {
-    return await this.eventsService.getEventsWithAttendeeContFiltered(filter);
+    return await this.eventsService.getEventsWithAttendeeContFilteredPaginated(
+      filter,
+      {
+        total: true,
+        currentPage: filter.page,
+        limit: filter.limit,
+      },
+    );
   }
   @Get('practis')
   async practis() {
