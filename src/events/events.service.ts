@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { Event } from './event.entity';
+import { Event } from './entitis/event.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AttendeeAnswerEnum } from './attendee';
+import { AttendeeAnswerEnum } from './entitis/attendee.entity';
+import { ListEvents, WhenEventFilter } from './dto/list/list.events';
 
 @Injectable()
 export class EventsService {
@@ -48,5 +49,33 @@ export class EventsService {
     return await this.getEventsWithAttendeeCountQuery()
       .andWhere('e.id = :id', { id })
       .getOne();
+  }
+  public async getEventsWithAttendeeContFiltered(filter?: ListEvents) {
+    let query = this.getEventsWithAttendeeCountQuery();
+
+    if (Object.keys(filter).length <= 0) {
+      return await query.getMany();
+    }
+    if (filter.when) {
+      if (filter.when == WhenEventFilter.Today) {
+        query = query.andWhere(
+          `e.when >= CURDATE() AND e.when <= CURDATE()+ INTERVAL 1 DAY`,
+        );
+      }
+      if (filter.when === WhenEventFilter.Tommorow) {
+        query = query.andWhere(
+          `e.when >= CURDATE() + INTERVAL 1 DAY AND e.when <= CURDATE()+ INTERVAL 2 DAY`,
+        );
+      }
+      if (filter.when == WhenEventFilter.ThisWeek) {
+        query = query.andWhere(`YEARWEEK(e.when, 1) = YEARWEEK(CURDATE(), 1) `);
+      }
+      if (filter.when == WhenEventFilter.ThisWeek) {
+        query = query.andWhere(
+          `YEARWEEK(e.when, 1) = YEARWEEK(CURDATE(), 1)+1 `,
+        );
+      }
+      return await query.getMany();
+    }
   }
 }

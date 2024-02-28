@@ -8,13 +8,15 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Like, MoreThan, Repository } from 'typeorm';
-import { CreateEventDto } from './create-event.dto';
-import { Event } from './event.entity';
-import { UpdateEventDto } from './update-event.dto';
+import { CreateEventDto } from './dto/create-event.dto';
+import { Event } from './entitis/event.entity';
+import { UpdateEventDto } from './dto/update-event.dto';
 import { EventsService } from './events.service';
+import { ListEvents } from './dto/list/list.events';
 
 @Controller('/events')
 export class EventsController {
@@ -23,8 +25,8 @@ export class EventsController {
     private readonly eventsService: EventsService,
   ) {}
   @Get()
-  async findAll() {
-    return await this.repository.find();
+  async findAll(@Query() filter: ListEvents) {
+    return await this.eventsService.getEventsWithAttendeeContFiltered(filter);
   }
   @Get('practis')
   async practis() {
