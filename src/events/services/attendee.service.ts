@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Attendee } from '../entitis/attendee.entity';
 import { Repository } from 'typeorm';
+import { CreateAttendeeDto } from '../dto/create-attendee.dto';
 
 @Injectable()
 export class AttendeesService {
@@ -13,5 +14,29 @@ export class AttendeesService {
     return await this.attendeeRepository.find({
       where: { event: { id: eventId } },
     });
+  }
+  public async findOneByEventIdAndUserId(
+    eventId: number,
+    userId: number,
+  ): Promise<Attendee | undefined> {
+    return await this.attendeeRepository.findOne({
+      where: {
+        event: { id: eventId },
+        user: { id: userId },
+      },
+    });
+  }
+  public async createOrUpdate(
+    input: CreateAttendeeDto,
+    eventId: number,
+    userId: number,
+  ): Promise<Attendee> {
+    const attendee =
+      (await this.findOneByEventIdAndUserId(eventId, userId)) ?? new Attendee();
+
+    attendee.eventId = eventId;
+    attendee.userId = userId;
+    attendee.answer = input.answer;
+    return await this.attendeeRepository.save(attendee);
   }
 }
