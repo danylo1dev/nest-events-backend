@@ -35,10 +35,13 @@ export class CurrentUserEventAttendanceController {
     @CurrentUser() user: User,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
   ) {
-    await this.eventsService.getEventsOrganizedByUserIdQueryPaginated(user.id, {
-      currentPage: page,
-      limit: 6,
-    });
+    return await this.eventsService.getEventsOrganizedByUserIdQueryPaginated(
+      user.id,
+      {
+        currentPage: page,
+        limit: 6,
+      },
+    );
   }
   @Get('/:eventId')
   async findOne(

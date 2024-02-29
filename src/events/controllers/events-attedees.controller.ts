@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { AttendeesService } from '../services/attendee.service';
 
-@Controller('events/:eventsId/attendees/')
+@Controller('events/:eventId/attendees')
 @SerializeOptions({ strategy: 'excludeAll' })
 export class EventsAttendeesController {
   constructor(private readonly attendeesService: AttendeesService) {}
@@ -17,6 +17,6 @@ export class EventsAttendeesController {
   @Get()
   @UseInterceptors(ClassSerializerInterceptor)
   async findAll(@Param('eventId', ParseIntPipe) eventId: number) {
-    return await this.attendeesService.findByEventId(eventId);
+    return await this.attendeesService.findByEventId(+eventId);
   }
 }
