@@ -7,6 +7,7 @@ import { Event } from './entitis/event.entity';
 import { AttendeesService } from './services/attendee.service';
 import { EventsAttendeesController } from './controllers/events-attedees.controller';
 import { EventsOrganizedByUserController } from './controllers/events-organized-by-user.controller';
+import { CurrentUserEventAttendanceController } from './controllers/current-user-event-attendance.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Event, Attendee])],
@@ -14,6 +15,7 @@ import { EventsOrganizedByUserController } from './controllers/events-organized-
     EventsController,
     EventsAttendeesController,
     EventsOrganizedByUserController,
+    CurrentUserEventAttendanceController,
   ],
   providers: [EventsService, AttendeesService],
 })
