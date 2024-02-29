@@ -1,7 +1,9 @@
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   HttpCode,
   NotFoundException,
@@ -9,25 +11,27 @@ import {
   Patch,
   Post,
   Query,
+  SerializeOptions,
+  UseGuards,
+  UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Like, MoreThan, Repository } from 'typeorm';
+import { User } from 'src/auth/entities/user.entity';
+import { AuthGuardJwt } from 'src/auth/guards/auth-guard-jwt.guard';
+import { CurrentUser } from 'src/auth/strategies/curent-user.decorator';
 import { CreateEventDto } from './dto/create-event.dto';
-import { Event } from './entitis/event.entity';
+import { ListEvents } from './dto/list/list.events';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { EventsService } from './events.service';
-import { ListEvents } from './dto/list/list.events';
 
 @Controller('/events')
+@SerializeOptions({ strategy: 'excludeAll' })
 export class EventsController {
-  constructor(
-    @InjectRepository(Event) private readonly repository: Repository<Event>,
-    private readonly eventsService: EventsService,
-  ) {}
+  constructor(private readonly eventsService: EventsService) {}
   @Get()
   @UsePipes(new ValidationPipe({ transform: true }))
+  @UseInterceptors(ClassSerializerInterceptor)
   async findAll(@Query() filter: ListEvents) {
     return await this.eventsService.getEventsWithAttendeeContFilteredPaginated(
       filter,
@@ -38,27 +42,9 @@ export class EventsController {
       },
     );
   }
-  @Get('practis')
-  async practis() {
-    return await this.repository.find({
-      select: ['id', 'when'],
-      where: [
-        {
-          id: MoreThan(2),
-          when: MoreThan(new Date('2021-02-12t13:00:00')),
-        },
-        {
-          description: Like('%meet%'),
-        },
-      ],
-      take: 2,
-      skip: 1,
-      order: {
-        id: 'DESC',
-      },
-    });
-  }
+
   @Get(':id')
+  @UseInterceptors(ClassSerializerInterceptor)
   async findOne(@Param('id') id) {
     const event = await this.eventsService.getEvent(+id);
     if (!event) {
@@ -68,27 +54,45 @@ export class EventsController {
   }
 
   @Post()
-  async create(@Body() body: CreateEventDto) {
-    return await this.repository.save({
-      ...body,
-      when: new Date(body.when),
-    });
+  @UseGuards(AuthGuardJwt)
+  @UseInterceptors(ClassSerializerInterceptor)
+  async create(@Body() body: CreateEventDto, @CurrentUser() user: User) {
+    return await this.eventsService.crreateEvent(body, user);
   }
   @Patch('/:id')
-  async update(@Param('id') id, @Body() body: UpdateEventDto) {
-    const event = await this.repository.findOne({ where: { id } });
-    return await this.repository.update(id, {
-      ...event,
-      ...body,
-      when: body.when ? new Date(body.when) : event.when,
-    });
+  @UseGuards(AuthGuardJwt)
+  @UseInterceptors(ClassSerializerInterceptor)
+  async update(
+    @Param('id') id,
+    @Body() body: UpdateEventDto,
+    @CurrentUser() user: User,
+  ) {
+    const event = await this.eventsService.getEvent(id);
+    if (!event) {
+      throw new NotFoundException();
+    }
+    if (event.organizerId !== user.id) {
+      throw new ForbiddenException(
+        null,
+        ' You are not  permision to edit this event',
+      );
+    }
+    return await this.eventsService.updateEvent(event, body);
   }
   @Delete('/:id')
   @HttpCode(204)
-  async remove(@Param('id') id) {
-    const res = await this.eventsService.deleteEvent(id);
-    if (res.affected !== 1) {
+  @UseGuards(AuthGuardJwt)
+  async remove(@Param('id') id, @CurrentUser() user: User) {
+    const event = await this.eventsService.getEvent(id);
+    if (!event) {
       throw new NotFoundException();
     }
+    if (event.organizerId !== user.id) {
+      throw new ForbiddenException(
+        null,
+        ' You are not  permision to edit this event',
+      );
+    }
+    await this.eventsService.deleteEvent(id);
   }
 }

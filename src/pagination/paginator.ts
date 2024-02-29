@@ -1,3 +1,4 @@
+import { Expose } from 'class-transformer';
 import { SelectQueryBuilder } from 'typeorm';
 
 export interface PaginateOptions {
@@ -5,8 +6,11 @@ export interface PaginateOptions {
   currentPage: number;
   total?: boolean;
 }
-
-export interface PaginatonResult<T> {
+@Expose()
+export class PaginatonResult<T> {
+  constructor(partial: Partial<PaginatonResult<T>>) {
+    Object.assign(this, partial);
+  }
   first: number;
   last: number;
   limit: number;
@@ -23,11 +27,11 @@ export async function paginate<T>(
 ): Promise<PaginatonResult<T>> {
   const offset = (options.currentPage - 1) * options.limit;
   const data = await qb.limit(options.limit).offset(offset).getMany();
-  return {
+  return new PaginatonResult({
     first: offset + 1,
     last: offset + data.length,
     limit: options.limit,
     total: options.total ? await qb.getCount() : null,
     data,
-  };
+  });
 }
