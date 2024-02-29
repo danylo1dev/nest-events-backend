@@ -7,12 +7,15 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Profile } from './profile.entity';
-import { Event } from 'src/events/entitis/event.entity';
+import { Event } from '../../events/entitis/event.entity';
 import { Expose } from 'class-transformer';
-import { Attendee } from 'src/events/entitis/attendee.entity';
+import { Attendee } from '../../events/entitis/attendee.entity';
 
 @Entity()
 export class User {
+  constructor(partial?: Partial<User>) {
+    Object.assign(this, partial);
+  }
   @PrimaryGeneratedColumn()
   @Expose()
   id: number;

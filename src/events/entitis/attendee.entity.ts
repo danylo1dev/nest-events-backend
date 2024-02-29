@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 import { Event } from './event.entity';
 import { Expose } from 'class-transformer';
-import { User } from 'src/auth/entities/user.entity';
+import { User } from '../../auth/entities/user.entity';
 export enum AttendeeAnswerEnum {
   Accepted = 1,
   Maybe = 2,

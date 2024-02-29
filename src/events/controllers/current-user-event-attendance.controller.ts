@@ -16,9 +16,9 @@ import {
 import { EventsService } from '../services/events.service';
 import { AttendeesService } from '../services/attendee.service';
 import { CreateAttendeeDto } from '../dto/create-attendee.dto';
-import { CurrentUser } from 'src/auth/strategies/curent-user.decorator';
-import { AuthGuardJwt } from 'src/auth/guards/auth-guard-jwt.guard';
-import { User } from 'src/auth/entities/user.entity';
+import { CurrentUser } from '../../auth/strategies/curent-user.decorator';
+import { AuthGuardJwt } from '../../auth/guards/auth-guard-jwt.guard';
+import { User } from '../../auth/entities/user.entity';
 
 @Controller('events-attendance')
 @SerializeOptions({ strategy: 'excludeAll' })
