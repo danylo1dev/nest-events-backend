@@ -20,10 +20,10 @@ import {
 import { User } from 'src/auth/entities/user.entity';
 import { AuthGuardJwt } from 'src/auth/guards/auth-guard-jwt.guard';
 import { CurrentUser } from 'src/auth/strategies/curent-user.decorator';
-import { CreateEventDto } from './dto/create-event.dto';
-import { ListEvents } from './dto/list/list.events';
-import { UpdateEventDto } from './dto/update-event.dto';
-import { EventsService } from './events.service';
+import { CreateEventDto } from '../dto/create-event.dto';
+import { ListEvents } from '../dto/list/list.events';
+import { UpdateEventDto } from '../dto/update-event.dto';
+import { EventsService } from '../services/events.service';
 
 @Controller('/events')
 @SerializeOptions({ strategy: 'excludeAll' })

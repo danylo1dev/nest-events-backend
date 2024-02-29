@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { Event } from './entitis/event.entity';
+import { Event, PaginatedEvents } from '../entitis/event.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AttendeeAnswerEnum } from './entitis/attendee.entity';
-import { ListEvents, WhenEventFilter } from './dto/list/list.events';
+import { AttendeeAnswerEnum } from '../entitis/attendee.entity';
+import { ListEvents, WhenEventFilter } from '../dto/list/list.events';
 import { PaginateOptions, paginate } from 'src/pagination/paginator';
-import { CreateEventDto } from './dto/create-event.dto';
+import { CreateEventDto } from '../dto/create-event.dto';
 import { User } from 'src/auth/entities/user.entity';
-import { UpdateEventDto } from './dto/update-event.dto';
+import { UpdateEventDto } from '../dto/update-event.dto';
 
 @Injectable()
 export class EventsService {
@@ -57,7 +57,7 @@ export class EventsService {
   public async getEventsWithAttendeeContFilteredPaginated(
     filter: ListEvents,
     options: PaginateOptions,
-  ) {
+  ): Promise<PaginatedEvents> {
     return await paginate(
       this.getEventsWithAttendeeContFiltered(filter),
       options,
@@ -110,6 +110,20 @@ export class EventsService {
       ...event,
       ...input,
       when: input.when ? new Date(input.when) : event.when,
+    });
+  }
+  public async getEventsOrganizedByUserIdQueryPaginated(
+    userId: number,
+    paginateOptions: PaginateOptions,
+  ): Promise<PaginatedEvents> {
+    return await paginate<Event>(
+      this.getEventsOrganizedByUserIdQuery(userId),
+      paginateOptions,
+    );
+  }
+  private getEventsOrganizedByUserIdQuery(userId: number) {
+    return this.getEventsBaseQuery().where('e.organizerId = :userId', {
+      userId,
     });
   }
 }
