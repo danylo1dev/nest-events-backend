@@ -10,14 +10,6 @@ services:
     ports:
       - 3308:3306
 
-  postgres:
-    image: postgres:13.1
-    restart: always
-    environment:
-      POSTGRES_PASSWORD: example
-    ports:
-      - 5432:5432
-
   adminer:
     image: adminer
     restart: always

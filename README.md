@@ -1,73 +1,71 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+#Event Manager
+This project is an event manager built using `NestJs`. It was created with the aim of enhancing my understanding of `NestJs` while tackling a challenging and complex task. The backend for events in this application follows a simple yet effective concept.
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+##Motivation
+My primary motivation for embarking on this project was to deepen my knowledge of `NestJs`. I believed that building an event manager would provide me with the opportunity to explore various aspects of `NestJs` in a practical and hands-on manner. Additionally, I was drawn to the challenge and complexity that such a project would entail.
+##What I was learn
+Throughout the development process, I have enhanced my knowledge of `NestJs` and gained valuable insights into `TypeORM`. Moreover, I have honed my testing skills through extensive work on `end-to-end` and `unit tests`.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+#Instaling
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Prerequisites
 
-## Installation
+Before you begin, ensure you have Node.js version 18.16.0 or later installed on your machine.
 
-```bash
-$ npm install
-```
+## Getting Started
 
-## Running the app
+To get started with the project, follow these steps:
 
-```bash
-# development
-$ npm run start
+1. Clone the repository from GitHub:
 
-# watch mode
-$ npm run start:dev
+   ```bash
+   git clone <repository_url>
+   ```
 
-# production mode
-$ npm run start:prod
-```
+2. Install all dependencies:
 
-## Test
+   ```bash
+   npm install
+   ```
+
+## Running with Docker (Optional)
+
+If you prefer to use Docker, the repository contains a `docker-compose.yml` file. It includes configurations for the database and Adminer.
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+docker-compose up
 ```
 
-## Support
+If you choose to host the database locally, it's up to you. This app utilizes MySQL.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## Environment Configuration
 
-## Stay in touch
+The repository includes an `Example.env` file. You should create the following environment files:
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+- `.env`: Default environment for new scripts
+- `dev.env`: Used during development (`npm run start:dev`)
+- `prod.env`: Used during production (`npm run start:prod`)
+- `e2e.env`: Used during end-to-end testing (`npm run test:e2e`)
 
-## License
+You can use the `Example.env` file as a template.
 
-Nest is [MIT licensed](LICENSE).
+## Running the Application
+
+To run the application, use the following commands:
+
+- **Development**:
+
+  ```bash
+  npm run start:dev
+  ```
+
+- **Production**:
+
+  ```bash
+  npm run build
+  npm run start:prod
+  ```
+
+Once the application is running, you can access it via `http://localhost:3000/`.
