@@ -30,8 +30,8 @@ export async function paginate<T>(
   return new PaginatonResult({
     first: offset + 1,
     last: offset + data.length,
-    limit: options.limit,
-    total: options.total ? await qb.getCount() : null,
+    limit: +options.limit,
+    total: +options.total ? await qb.getCount() : null,
     data,
   });
 }
