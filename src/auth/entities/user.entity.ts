@@ -19,20 +19,26 @@ export class User {
   @PrimaryGeneratedColumn()
   @Expose()
   id: number;
+
   @Column({ unique: true })
   @Expose()
   username: string;
+
   @Column()
   password: string;
+
   @Column({ unique: true })
   @Expose()
   email: string;
+
   @Column()
   @Expose()
   firstName: string;
+
   @Column()
   @Expose()
   lastName: string;
+
   @OneToOne(() => Profile)
   @JoinColumn()
   @Expose()
@@ -41,6 +47,7 @@ export class User {
   @OneToMany(() => Event, (event) => event.organizer)
   @Expose()
   organized: Event[];
+
   @OneToMany(() => Attendee, (attendee) => attendee.user)
   attended: Attendee[];
 }

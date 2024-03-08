@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Event, PaginatedEvents } from '../entitis/event.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -16,14 +20,16 @@ export class EventsService {
     private repository: Repository<Event>,
   ) {}
   private getEventsBaseQuery(): SelectQueryBuilder<Event> {
-    return this.repository.createQueryBuilder('e').orderBy('e.id', 'DESC');
+    return this.repository
+      .createQueryBuilder('event')
+      .orderBy('event.id', 'DESC');
   }
   public getEventsWithAttendeeCountQuery(): SelectQueryBuilder<Event> {
     return this.getEventsBaseQuery()
-      .loadRelationCountAndMap('e.attendeeCount', 'e.attendees')
+      .loadRelationCountAndMap('event.attendeeCount', 'event.attendees')
       .loadRelationCountAndMap(
-        'e.attendeeAccepted',
-        'e.attendees',
+        'event.attendeeAccepted',
+        'event.attendees',
         'attendee',
         (qb) =>
           qb.where('attendee.answer = :answer', {
@@ -31,8 +37,8 @@ export class EventsService {
           }),
       )
       .loadRelationCountAndMap(
-        'e.attendeeMaybe',
-        'e.attendees',
+        'event.attendeeMaybe',
+        'event.attendees',
         'attendee',
         (qb) =>
           qb.where('attendee.answer = :answer', {
@@ -40,8 +46,8 @@ export class EventsService {
           }),
       )
       .loadRelationCountAndMap(
-        'e.attendeeRejected',
-        'e.attendees',
+        'event.attendeeRejected',
+        'event.attendees',
         'attendee',
         (qb) =>
           qb.where('attendee.answer = :answer', {
@@ -53,7 +59,7 @@ export class EventsService {
     id: number,
   ): Promise<Event | undefined> {
     return await this.getEventsWithAttendeeCountQuery()
-      .andWhere('e.id = :id', { id })
+      .andWhere('event.id = :id', { id })
       .getOne();
   }
 
@@ -80,12 +86,12 @@ export class EventsService {
     if (filter.when) {
       if (filter.when == WhenEventFilter.Today) {
         query = query.andWhere(
-          `e.when >= CURDATE() AND e.when <= CURDATE()+ INTERVAL 1 DAY`,
+          `event.when >= CURDATE() AND e.when <= CURDATE()+ INTERVAL 1 DAY`,
         );
       }
       if (filter.when === WhenEventFilter.Tommorow) {
         query = query.andWhere(
-          `e.when >= CURDATE() + INTERVAL 1 DAY AND e.when <= CURDATE()+ INTERVAL 2 DAY`,
+          `event.when >= CURDATE() + INTERVAL 1 DAY AND e.when <= CURDATE()+ INTERVAL 2 DAY`,
         );
       }
       if (filter.when == WhenEventFilter.ThisWeek) {
@@ -101,7 +107,7 @@ export class EventsService {
   }
   public async deleteEvent(id: number) {
     return await this.repository
-      .createQueryBuilder('e')
+      .createQueryBuilder('event')
       .delete()
       .where('id = :id', { id })
       .execute();
@@ -115,7 +121,17 @@ export class EventsService {
       }),
     );
   }
-  public async updateEvent(event: Event, input: UpdateEventDto) {
+  public async updateEvent(id: number, input: UpdateEventDto, user: User) {
+    const event = await this.getEventWithAttendeeCount(id);
+    if (!event) {
+      throw new NotFoundException();
+    }
+    if (event.organizerId !== user.id) {
+      throw new ForbiddenException(
+        null,
+        'You do not have permission to edit this event',
+      );
+    }
     return await this.repository.save(
       new Event({
         ...event,
@@ -136,7 +152,7 @@ export class EventsService {
   private getEventsOrganizedByUserIdQuery(
     userId: number,
   ): SelectQueryBuilder<Event> {
-    return this.getEventsBaseQuery().where('e.organizerId = :userId', {
+    return this.getEventsBaseQuery().where('event.organizerId = :userId', {
       userId,
     });
   }
@@ -153,7 +169,7 @@ export class EventsService {
     userId: number,
   ): SelectQueryBuilder<Event> {
     return this.getEventsBaseQuery()
-      .leftJoinAndSelect('e.attendees', 'a')
+      .leftJoinAndSelect('event.attendees', 'a')
       .where('a.userId = : userId', { userId });
   }
 }
