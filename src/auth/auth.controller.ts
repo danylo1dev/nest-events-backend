@@ -14,6 +14,7 @@ import { CurrentUser } from './strategies/curent-user.decorator';
 
 @Controller('auth')
 @SerializeOptions({ strategy: 'excludeAll' })
+@UseInterceptors(ClassSerializerInterceptor)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
@@ -27,7 +28,6 @@ export class AuthController {
   }
   @Get('/profile')
   @UseGuards(AuthGuardJwt)
-  @UseInterceptors(ClassSerializerInterceptor)
   async getProfile(@CurrentUser() user) {
     return user;
   }
