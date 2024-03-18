@@ -12,7 +12,7 @@ Throughout the development process, I have enhanced my knowledge of `NestJs` and
 
 ---
 
-# Instaling
+# Installing
 
 ## Prerequisites
 
