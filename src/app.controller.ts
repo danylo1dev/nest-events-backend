@@ -9,7 +9,7 @@ import {
 @Controller('/')
 @SerializeOptions({ strategy: 'excludeAll' })
 @UseInterceptors(ClassSerializerInterceptor)
-export class AuthController {
+export class AppController {
   @Get()
   getHello() {
     return 'hello world';
