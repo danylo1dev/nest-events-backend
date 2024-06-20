@@ -38,4 +38,4 @@ jobs:
         touch .env
         echo "${{secrets.PROD_ENV_FILE}}" > dev.env -d
     - run: npm run build --if-present
-    - run: sudo npm run start:prod -d
+    - run: pm2 restart ./dist/main.js
