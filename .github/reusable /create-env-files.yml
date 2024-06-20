@@ -1,0 +1,16 @@
+name: Create Envs
+on:
+  workflow_call:
+  
+jobs:
+  create_envs:
+    steps:
+    - run: | 
+        touch .env
+        echo "${{secrets.PROD_ENV_FILE}}" > .env -d
+    - run: | 
+        touch .env
+        echo "${{secrets.PROD_ENV_FILE}}" > prod.env -d
+    - run: | 
+        touch .env
+        echo "${{secrets.PROD_ENV_FILE}}" > dev.env -d
