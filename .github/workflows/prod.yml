@@ -25,8 +25,8 @@ jobs:
         cache: 'npm'
     - run: npm ci
     - run: sudo docker compose up -d
-- name: Make prod envfile
-      uses: SpicyPizza/create-envfile@v2.0
+    - name: Make prod envfile
+      uses: SpicyPizza/create-envfile@v2.0.3
       with:
         envkey_DB_HOST: ${{ vars.PROD_DB_HOST }}
         envkey_DB_PORT: ${{ vars.PROD_DB_PORT }}
@@ -41,7 +41,7 @@ jobs:
         fail_on_empty: false
         sort_keys: false
     - name: Make dev envfile
-      uses: SpicyPizza/create-envfile@v2.0
+      uses: SpicyPizza/create-envfile@v2.0.3
       with:
         envkey_DB_HOST: ${{ vars.DEV_DB_HOST }}
         envkey_DB_PORT: ${{ vars.DEV_DB_PORT }}
