@@ -25,14 +25,35 @@ jobs:
         cache: 'npm'
     - run: npm ci
     - run: sudo docker compose up -d
-    - run: | 
-        touch .env
-        echo "${{secrets.PROD_ENV_FILE}}" > .env -d
-    - run: | 
-        touch .env
-        echo "${{secrets.PROD_ENV_FILE}}" > prod.env -d
-    - run: | 
-        touch .env
-        echo "${{secrets.PROD_ENV_FILE}}" > dev.env -d
+- name: Make prod envfile
+      uses: SpicyPizza/create-envfile@v2.0
+      with:
+        envkey_DB_HOST: ${{ vars.PROD_DB_HOST }}
+        envkey_DB_PORT: ${{ vars.PROD_DB_PORT }}
+        envkey_DB_USER: ${{ vars.PROD_DB_USER }}
+        envkey_DB_NAME: ${{ vars.PROD_DB_NAME }}
+        envkey_NODE_ENV: prod
+        envkey_DB_DROP_SCHEMA: 0
+        envkey_JWT_EXPIRES_IN: ${{ vars.PROD_JWT_EXPIRES_IN }}
+        envkey_SECRET_DB_PASSWORD: ${{ secrets.PROD_DB_PASSWORD }}
+        envkey_SECRET_JWT_SECRET: ${{ secrets.PROD_JWT_SECRET }}
+        file_name: prod.env
+        fail_on_empty: false
+        sort_keys: false
+    - name: Make dev envfile
+      uses: SpicyPizza/create-envfile@v2.0
+      with:
+        envkey_DB_HOST: ${{ vars.DEV_DB_HOST }}
+        envkey_DB_PORT: ${{ vars.DEV_DB_PORT }}
+        envkey_DB_USER: ${{ vars.DEV_DB_USER }}
+        envkey_DB_NAME: ${{ vars.DEV_DB_NAME }}
+        envkey_NODE_ENV: dev
+        envkey_DB_DROP_SCHEMA: 0
+        envkey_JWT_EXPIRES_IN: ${{ vars.DEV_JWT_EXPIRES_IN }}
+        envkey_SECRET_DB_PASSWORD: ${{ secrets.DEV_DB_PASSWORD }}
+        envkey_SECRET_JWT_SECRET: ${{ secrets.DEV_JWT_SECRET }}
+        file_name: dev.env
+        fail_on_empty: false
+        sort_keys: false
     - run: npm run build --if-present
     - run: pm2 restart ./dist/main.js
